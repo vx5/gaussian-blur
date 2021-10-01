@@ -1,0 +1,1 @@
+# fast-text-analyzer
