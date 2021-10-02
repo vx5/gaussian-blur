@@ -43,7 +43,7 @@ void makeGaussKernel(float** kernel, int kernelSize) {
 }
 */
 
-void makeBlurredImage(unsigned char* origImage, unsigned char* blurredImage, float** kernel) {
+void makeBlurredImage(const unsigned char* origImage, unsigned char* blurredImage, float** kernel) {
 	// 
 
 
@@ -52,6 +52,7 @@ void makeBlurredImage(unsigned char* origImage, unsigned char* blurredImage, flo
 
 // Main takes in command line arguments
 int main(int argc, char** argv) {
+	// META: Reading of input and initialization
 	// Catch invalid number of arguments
 	if (argc != 3) {
 		char invalidNumArgs[] = ERROR_FY("2 arguments required "
@@ -86,7 +87,9 @@ int main(int argc, char** argv) {
 	// Create copy where blurred pixels will be placed
 	size_t imageSize = height * width * numChannels;
 	unsigned char* blurred = malloc(imageSize);
-	// 
+	// META: Blurring of image 
+	// Populate blurred image
+	// META: Writing of image and exit
 	stbi_image_free(origImage);
 	free(blurred);
 	exit(EXIT_SUCCESS);
