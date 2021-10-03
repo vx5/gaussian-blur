@@ -101,10 +101,10 @@ int main(int argc, char** argv) {
 		fromPtr += numChannels;
 		toPtr += 1;
 	}
-	// Populate blurred image
 	// META: Writing of image and exit
-	char* newFilename = malloc(19 + sizeof(filename) / sizeof(char));
-	stbi_write_jpg(strcat(strcat(newFilename, "blur_"), filename), width, height, 1, blurred, 100);
+	char blurTag[5] = "BLUR_";
+	char* newFilename = malloc(sizeof(blurTag) + sizeof(filename) / sizeof(char));
+	stbi_write_jpg(strcat(strcat(newFilename, blurTag), filename), width, height, 1, blurred, 100);
 	stbi_image_free(origImage);
 	free(blurred);
 	free(newFilename);
