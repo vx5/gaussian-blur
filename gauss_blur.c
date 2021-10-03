@@ -10,14 +10,31 @@
 // POSIX threads used for multithreading
 #include <pthread.h>
 // TODO gauss.h
-// For tagging error text with red "ERROR: " declaration
-#define ERROR_FY(string) "\x1b[31mERROR:\x1b[0m " string
+// For tagging error text with red "ERROR: " declaration and newline
+#define ERROR_TAG "\x1b[31mERROR:\x1b[0m "
 
+// META: Helper functions
 
+/*
+INPUT: Error message to be used when exiting
+OUTPUT: None
+ACTIONS: Prints error message to stderr with red "ERROR: "
+text, and exits program with EXIT_FAILURE
+*/
+void exitWithError(char* errorMsg) {
+	fprintf(stderr, ERROR_TAG);
+	fprintf(stderr, "%s", errorMsg);
+	fprintf(stderr, "\n");
+	exit(EXIT_FAILURE);
+}
+
+/*
+INPUT: String filename
+OUTPUT: File extension (e.g., "png") if present, else empty string
+*/
 char* filenameExt(char *filename) {
     char* ext = strrchr(filename, '.');
     if (!ext) return "";
-    printf("%s", ext);
     return ext;
 }
 
@@ -55,42 +72,41 @@ int main(int argc, char** argv) {
 	// META: Reading of input and initialization
 	// Catch invalid number of arguments
 	if (argc != 3) {
-		char invalidNumArgs[] = ERROR_FY("2 arguments required "
-		"e.g., \"./gauss_blur example.png 5\", to blur example.png with kernel size 5\n");
-		fprintf(stderr, invalidNumArgs);
-		exit(EXIT_FAILURE);
+		exitWithError("2 arguments required "
+		"e.g., \"./gauss_blur example.png 5\", to blur example.png with kernel size 5");
 	}
 	// Read number of threads
+	char* filename = argv[1];
 	int kernelSize = atoi(argv[2]);
 	// Catch invalid kernel size
-	if (kernelSize % 2 == 0) {
-		char invalidNumArgs[] = ERROR_FY("Kernel size must be an odd positive integer\n");
-		fprintf(stderr, invalidNumArgs);
-		exit(EXIT_FAILURE);
-	}
+	if (kernelSize % 2 == 0) exitWithError("Kernel size must be an odd positive integer");
 	// Load file using stb, last argument 0 ensures that all channels are loaded
 	int height, width, numChannels;
-	const unsigned char* origImage = stbi_load(argv[1], &width, &height, &numChannels, 0);
+	uint8_t* origImage = stbi_load(argv[1], &width, &height, &numChannels, 0);
 	// Catch error or invalid loading of iamge
-	if (origImage == NULL || filenameExt(argv[1]) != "jpg") {
-		char invalidNumArgs[] = ERROR_FY("File could not be loaded -- please name a .jpg file "
-		"in the current directory\n");
-		fprintf(stderr, invalidNumArgs);
-		exit(EXIT_FAILURE);
+	if (origImage == NULL || !(strncmp(filenameExt(filename), "jpg", 3))) {
+		exitWithError("File could not be loaded -- please name a .jpg file "
+		"in the current directory");
 	}
 	// Catch unusually large kernel size
-	if (kernelSize > height || kernelSize > width) {
-		char invalidNumArgs[] = ERROR_FY("Kernel size must be less than min of height, width\n");
-		fprintf(stderr, invalidNumArgs);
-		exit(EXIT_FAILURE);
-	}
+	if (kernelSize > height || kernelSize > width) exitWithError("Kernel size must be less than min of height, width");
 	// Create copy where blurred pixels will be placed
 	size_t imageSize = height * width * numChannels;
-	unsigned char* blurred = malloc(imageSize);
+	uint8_t* blurred = malloc(imageSize);
 	// META: Blurring of image 
+	uint8_t* fromPtr = origImage;
+	uint8_t* toPtr = blurred;
+	while (fromPtr < origImage + imageSize) {
+		*toPtr = (uint8_t) ((*fromPtr + *(fromPtr + 1) + *(fromPtr + 2)) / 3.0);
+		fromPtr += numChannels;
+		toPtr += 1;
+	}
 	// Populate blurred image
 	// META: Writing of image and exit
+	char* newFilename = malloc(19 + sizeof(filename) / sizeof(char));
+	stbi_write_jpg(strcat(strcat(newFilename, "blur_"), filename), width, height, 1, blurred, 100);
 	stbi_image_free(origImage);
 	free(blurred);
+	free(newFilename);
 	exit(EXIT_SUCCESS);
 }
