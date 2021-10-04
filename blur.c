@@ -110,10 +110,6 @@ int main(int argc, char** argv) {
 	// Applying kernel to image
 	printf("Applying kernel...\n");
 	// Multithreads kernel application
-	int pixelsPerThread = ceil((height * width) / numThreads);
-	int curPixel = 0;
-	int nextPixel = curPixel + pixelsPerThread;
-	pthread_t threads[numThreads];
 	// Initialize struct with key info used by all threads
 	struct threadCommonArgs commonArgs;
 	commonArgs.kernelSize = kernelSize; 
@@ -124,16 +120,27 @@ int main(int argc, char** argv) {
 	commonArgs.width = width;
 	commonArgs.numChannels = numChannels;
 	commonArgs.channelOffsets = channelOffsets;
+	// Initialize array of structs to be taken in by threads
+	int pixelsPerThread = ceil((height * width) / numThreads);
+	int startPixel = 0;
+	int endPixel = startPixel + pixelsPerThread;
+	struct threadArgs args[numThreads];
+	for (int thread = 0; thread < numThreads; thread++) {
+		struct threadArgs thisThreadArgs = {commonArgs, startPixel, endPixel};
+		args[thread] = thisThreadArgs;
+		// Calculates starting and end pixels for each thread
+		startPixel += pixelsPerThread;
+		endPixel += pixelsPerThread;
+		// Ensures last thread's end pixel is in bounds
+		if (endPixel > height * width) endPixel = height * width;
+	}
+	// To retain threads to be joined
+	pthread_t threads[numThreads];
 	// Create and join thread loops
 	for (int thread = 0; thread < numThreads; thread++) {
-		// Initializes struct useful to each thread
-		if (nextPixel > height * width) nextPixel = height * width;
-		struct threadArgs args = {commonArgs, curPixel, nextPixel};
-		if (pthread_create(threads + thread, NULL, threadApplyKernel, &args) != 0) {
+		if (pthread_create(threads + thread, NULL, threadApplyKernel, &args[thread]) != 0) {
 			exitWithError("Error in applying kernel - thread creation");
 		}
-		curPixel = nextPixel;
-		nextPixel += pixelsPerThread;
 	}
 	for (int thread = 0; thread < numThreads; thread++) {
 		if (pthread_join(threads[thread], NULL) != 0) {

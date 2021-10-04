@@ -54,7 +54,7 @@ void applyKernel(int kernelSize, float** kernel, unsigned char* src, unsigned ch
 	// Define kernel radius
 	int kernelRad = kernelSize / 2;
 	// Iterates through each pixel
-	for (int pixelNum = 0; pixelNum < height * width; pixelNum++) {
+	for (int pixelNum = startPixelNum; pixelNum < endPixelNum; pixelNum++) {
 		int row = pixelNum / width;
 		int col = pixelNum % width;
 		// Stores sum of all kernel values seen (is only <1 when kernel is not fully contained within image)
