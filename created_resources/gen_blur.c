@@ -77,7 +77,7 @@ void applyKernel(int kernelSize, float** kernel, unsigned char* src, unsigned ch
 					uint8_t* checkPixel = src + ((realRow * width + realCol) * numChannels);
 					// Update channel sums
 					for (int channel = 0; channel < numChannels; channel++) {
-						channelSums[channel] += kernelVal * *(checkPixel + channelOffsets[channel]);
+						channelSums[channel] += kernelVal * checkPixel[channelOffsets[channel]];
 					}
 				}
 			}
@@ -85,7 +85,7 @@ void applyKernel(int kernelSize, float** kernel, unsigned char* src, unsigned ch
 		// Access and update relevant pixel information in destination image bytes
 		uint8_t* dstPixel = dst + ((row * width + col) * numChannels);
 		for (int channel = 0; channel < numChannels; channel++) {
-			*(dstPixel + channelOffsets[channel]) = (uint8_t) (channelSums[channel] / weightsSeen);
+			dstPixel[channelOffsets[channel]] = (uint8_t) (channelSums[channel] / weightsSeen);
 		}	
 	}
 }

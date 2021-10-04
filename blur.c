@@ -10,7 +10,6 @@
 #include "stb_resources/stb_image_write.h"
 // POSIX threads used for multithreading
 #include <pthread.h>
-// Defines maximum number of threads
 #define PTHREAD_THREADS_MAX 512
 // Headers required
 #include "created_resources/gen_helper.h"
@@ -48,7 +47,7 @@ struct threadArgs {
 /*
 INPUT: Struct of type threadArgs (above)
 OUTPUT: None
-ACTION: Creates thread that 
+ACTION: Thread function that delegates thread informaton to applyKernel()
 */
 void* threadApplyKernel(void* args) {
 	struct threadArgs* allArgs = (struct threadArgs*) args;
@@ -138,7 +137,7 @@ int main(int argc, char** argv) {
 	pthread_t threads[numThreads];
 	// Create and join thread loops
 	for (int thread = 0; thread < numThreads; thread++) {
-		if (pthread_create(threads + thread, NULL, threadApplyKernel, &args[thread]) != 0) {
+		if (pthread_create(&threads[thread], NULL, threadApplyKernel, &args[thread]) != 0) {
 			exitWithError("Error in applying kernel - thread creation");
 		}
 	}
