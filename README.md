@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This projects allows the user to blur a 3-channel (RGB) JPG image using a Gaussian kernel. Image blurring often uses a kernel (a 2D array of values) to color each pixel based on a weighted average of surrounding pixels. A Gaussian kernel populates the 2D array using a Gaussian probability distribution, which is used to weight the surrounding cell's values. It allows the user to select the degree of blurring (by kernel size, rather than the sigma of the Gaussian function, based on online notes about ease-of-use), the number of threads to use (multithreading is implemented), and the quality of the output JPG. An example of blurring is below:
+This projects allows the user to blur a 3-channel (RGB) JPG image using a Gaussian kernel. Image blurring often uses a kernel (a 2D array of values) to color each pixel based on a weighted average of surrounding pixels. A Gaussian kernel populates the 2D array using a Gaussian probability distribution, which is used to weight the surrounding cell's values. It allows the user to select the degree of blurring (by kernel size, rather than the sigma of the Gaussian function, based on online notes about ease-of-use), the number of threads to use (multithreading is implemented), and the quality of the output JPG. An example result is below:
 
 **Before:**
 ![Pre blur](https://github.com/vx5/gaussian-blur/blob/main/images/example.jpg?raw=true)
