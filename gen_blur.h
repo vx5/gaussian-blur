@@ -24,7 +24,7 @@ well as offsets from a given byte location for a pixel, which are used to access
 OUTPUT: None
 ACTIONS: Applies provided kernel to source image bytes, stores result in destination image bytes
 */
-void applyKernel(int kernelSize, float kernel[kernelSize][kernelSize], unsigned char* src, unsigned char* dst, 
-	int height, int width, int numChannels, int channelOffsets[numChannels]);
+void applyKernel(int kernelSize, float** kernel, unsigned char* src, unsigned char* dst, 
+	int height, int width, int numChannels, int channelOffsets[numChannels], int startPixelNum, int endPixel);
 
 #endif
