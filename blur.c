@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	// META: Reading of input and initialization
 	// Catch invalid number of arguments
 	if (argc != 5) {
-		exitWithError("3-4 arguments required "
+		exitWithError("4 arguments required "
 		"e.g., \"./gauss_blur example.png 5 4 80\", to blur example.png with kernel size 5 using 4 threads\n"
 		"where blurred image will be written with 80% quality");
 	}
