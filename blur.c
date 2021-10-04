@@ -13,18 +13,19 @@
 // Defines maximum number of threads
 #define PTHREAD_THREADS_MAX 512
 // Headers required
-#include "gen_helper.h"
-#include "gen_blur.h"
-#include "gauss_fx.h"
+#include "created_resources/gen_helper.h"
+#include "created_resources/gen_blur.h"
+#include "created_resources/gauss_fx.h"
 // For number of supported channels
 #define TARGET_CHANNELS 3
+
+// META: For use in main call below
 
 // For offsets in uint8_t* image bytes
 int channelOffsets[TARGET_CHANNELS] = {0, 1, 2};
 
-// META: Helper functions
-
-// Struct to hold arguments for each thread
+// Struct to hold arguments common to all threads
+// See gen_blur for info on parameters
 struct threadCommonArgs {
 	int kernelSize;
 	float** kernel; 
@@ -36,12 +37,19 @@ struct threadCommonArgs {
 	int* channelOffsets;
 };
 
+// Struct to hold arguments unique to some threads
+// See gen_blur for info on parameters
 struct threadArgs {
 	struct threadCommonArgs commonArgs;
 	int startPixelNum;
 	int endPixelNum;
 };
 
+/*
+INPUT: Struct of type threadArgs (above)
+OUTPUT: None
+ACTION: Creates thread that 
+*/
 void* threadApplyKernel(void* args) {
 	struct threadArgs* allArgs = (struct threadArgs*) args;
 	struct threadCommonArgs commonArgs = allArgs -> commonArgs;
@@ -68,7 +76,7 @@ int main(int argc, char** argv) {
 	int numThreads = atoi(argv[3]);
 	int writeQuality = atoi(argv[4]);
 	// Catch invalid kernel size and invalid thread nums
-	if (kernelSize % 2 == 0) exitWithError("Kernel size must be odd positive integer");
+	if (kernelSize % 2 == 0 || kernelSize < 3) exitWithError("Kernel size must be odd integer 3 or greater");
 	if (numThreads <= 0) exitWithError("Number of threads must be positive integer");
 	if (writeQuality <= 0 || writeQuality > 100) exitWithError("Write quality must be positive integer between 1 and 100");
 	// Ensure num threads does not exceed max
