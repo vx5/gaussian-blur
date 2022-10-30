@@ -25,7 +25,7 @@ int channelOffsets[TARGET_CHANNELS] = {0, 1, 2};
 
 // Struct to hold arguments common to all threads
 // See gen_blur for info on parameters
-struct threadCommonArgs {
+struct ThreadCommonArgs {
 	int kernelSize;
 	float** kernel; 
 	unsigned char* src;
@@ -38,8 +38,8 @@ struct threadCommonArgs {
 
 // Struct to hold arguments unique to some threads
 // See gen_blur for info on parameters
-struct threadArgs {
-	struct threadCommonArgs commonArgs;
+struct ThreadArgs {
+	struct ThreadCommonArgs commonArgs;
 	int startPixelNum;
 	int endPixelNum;
 };
@@ -50,8 +50,8 @@ OUTPUT: None
 ACTION: Thread function that delegates thread informaton to applyKernel()
 */
 void* threadApplyKernel(void* args) {
-	struct threadArgs* allArgs = (struct threadArgs*) args;
-	struct threadCommonArgs commonArgs = allArgs -> commonArgs;
+	struct ThreadArgs* allArgs = (struct ThreadArgs*) args;
+	struct ThreadCommonArgs commonArgs = allArgs -> commonArgs;
 	applyKernel(commonArgs.kernelSize, commonArgs.kernel, 
 		commonArgs.src, commonArgs.dst, commonArgs.height, 
 		commonArgs.width, commonArgs.numChannels, 
@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
 	printf("Applying kernel...\n");
 	// Multithreads kernel application
 	// Initialize struct with key info used by all threads
-	struct threadCommonArgs commonArgs;
+	struct ThreadCommonArgs commonArgs;
 	commonArgs.kernelSize = kernelSize; 
 	commonArgs.kernel = useKernel; 
 	commonArgs.src = origImage;
@@ -123,9 +123,9 @@ int main(int argc, char** argv) {
 	int pixelsPerThread = ceil((height * width) / numThreads);
 	int startPixel = 0;
 	int endPixel = startPixel + pixelsPerThread;
-	struct threadArgs args[numThreads];
+	struct ThreadArgs args[numThreads];
 	for (int thread = 0; thread < numThreads; thread++) {
-		struct threadArgs thisThreadArgs = {commonArgs, startPixel, endPixel};
+		struct ThreadArgs thisThreadArgs = {commonArgs, startPixel, endPixel};
 		args[thread] = thisThreadArgs;
 		// Calculates starting and end pixels for each thread
 		startPixel += pixelsPerThread;
