@@ -32,7 +32,7 @@ When the kernel stretches partially extends past the bounds of the image, the re
 
 #### Optimizations
 
-I implemented multithreading, using POSIX threads/pthreads, to improve execution speed. Based on the number of threads, the images is divided into several sections -- each thread determines the blurred version of its subsection. The speed improvement may be considerable -- below is an example of trying to blur a large image with 1 vs. 2 threads:
+I implemented multithreading, using POSIX threads/pthreads, to improve execution speed. Based on the number of threads, the image is divided into several sections -- each thread determines the blurred version of its subsection. The speed improvement may be considerable, but _has not yet been finalized_ -- below is a test example of trying to blur a large image with 1 vs. 2 threads:
 
 ![Speed improvement](https://github.com/vx5/gaussian-blur/blob/main/images/performance.jpg?raw=true)
 
